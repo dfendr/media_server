@@ -26,12 +26,6 @@ media types, including movies, TV shows, audiobooks, and more.
    Ensure Docker is installed and Docker Compose is available.
 
 2. **Setup `.env` File**:
-   Copy the `.env.example` file to `.env`:
-
-   ```
-   cp .env.example .env
-   ```
-
    Edit the `.env` file to set paths, ports, and user permissions.
 
 3. **Validate Paths**:
