@@ -17,7 +17,6 @@ media types, including movies, TV shows, audiobooks, and more.
 - **Homarr**: Dashboard to monitor/manage services.
 - **qBittorrent**: Torrent client.
 - **Watchtower**: Automated Docker updates.
-- **ErsatzTV**: Live TV streaming from Jellyfin.
 
 ---
 
