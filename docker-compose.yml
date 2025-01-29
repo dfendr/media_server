@@ -59,6 +59,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - UMASK=002
     volumes:
       - ${TV_PATH}:/media/tv
       - ${ANIME_PATH}:/media/anime
@@ -179,4 +180,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     network_mode: synobridge
+    restart: unless-stopped
+
+  subsyncarr:
+    image: mrorbitman/subsyncarr:latest
+    container_name: subsyncarr
+    volumes:
+      - ${MEDIA_PATH}:/scan_dir
     restart: unless-stopped
