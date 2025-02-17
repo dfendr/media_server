@@ -32,7 +32,7 @@ media types, including movies, TV shows, audiobooks, and more.
    Use the provided script to validate or create required directories:
 
    ```
-   ./validate_env_paths.sh
+   ./validate_paths.sh
    ```
 
 ---
