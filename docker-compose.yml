@@ -8,7 +8,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${MOVIES_PATH}:/media/movies
-      - ${CONFIG_PATH}/radarr:/config
+      - ${RADARR_CONFIG}:/config
       - ${DOWNLOADS_PATH}:/downloads
     ports:
       - ${RADARR_PORT}:7878
@@ -24,10 +24,10 @@ services:
       - TZ=${TZ}
     volumes:
       - ${MEDIA_PATH}:/media
-      - ${CONFIG_PATH}/jellyfin/log:/log
-      - ${CONFIG_PATH}/jellyfin/data:/data
-      - ${CONFIG_PATH}/jellyfin/config:/config
-      - ${CONFIG_PATH}/jellyfin/cache:/cache
+      - ${JELLYFIN_LOG}:/log
+      - ${JELLYFIN_DATA}:/data
+      - ${JELLYFIN_CONFIG}:/config
+      - ${JELLYFIN_CACHE}:/cache
     ports:
       - ${JELLYFIN_PORT}:8096
     devices:
@@ -45,7 +45,7 @@ services:
     volumes:
       - ${TV_PATH}:/media/tv
       - ${ANIME_PATH}:/media/anime
-      - ${CONFIG_PATH}/sonarr:/config
+      - ${SONARR_CONFIG}:/config
       - ${DOWNLOADS_PATH}:/downloads
     ports:
       - ${SONARR_PORT}:8989
@@ -64,7 +64,7 @@ services:
       - ${TV_PATH}:/media/tv
       - ${ANIME_PATH}:/media/anime
       - ${MOVIES_PATH}:/media/movies
-      - ${CONFIG_PATH}/bazarr:/config
+      - ${BAZARR_CONFIG}:/config
       - ${DOWNLOADS_PATH}:/downloads
     ports:
       - ${BAZARR_PORT}:6767
@@ -79,7 +79,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_PATH}/prowlarr:/config
+      - ${PROWLARR_CONFIG}:/config
     ports:
       - ${PROWLARR_PORT}:9696
     network_mode: synobridge
@@ -97,8 +97,8 @@ services:
     volumes:
       - ${MEDIA_PATH}/audiobooks:/media/audiobooks:rw
       - ${MEDIA_PATH}/podcasts:/media/podcasts
-      - ${CONFIG_PATH}/audiobookshelf/config:/config:rw
-      - ${CONFIG_PATH}/audiobookshelf/metadata:/metadata:rw
+      - ${AUDIOBOOKSHELF_CONFIG}:/config:rw
+      - ${AUDIOBOOKSHELF_METADATA}:/metadata:rw
     ports:
       - ${AUDIOBOOKSHELF_PORT}:80
     network_mode: synobridge
@@ -115,7 +115,7 @@ services:
       - ${MEDIA_PATH}/books:/media/books
       - ${MEDIA_PATH}/comics:/media/comics
       - ${MEDIA_PATH}/manga:/media/manga
-      - ${CONFIG_PATH}/kavita:/kavita/config
+      - ${KAVITA_CONFIG}:/kavita/config
     ports:
       - ${KAVITA_PORT}:5000
     network_mode: synobridge
@@ -130,7 +130,7 @@ services:
       - TZ=${TZ}
       - LOG_LEVEL=info
     volumes:
-      - ${CONFIG_PATH}/jellyseerr:/app/config
+      - ${JELLYSEERR_CONFIG}:/app/config
     ports:
       - ${JELLYSEERR_PORT}:5055
     network_mode: synobridge
@@ -142,11 +142,11 @@ services:
     environment:
       - TZ=${TZ}
     volumes:
-      - ${CONFIG_PATH}/homarr:/app/data/configs
+      - ${HOMARR_CONFIG}:/app/data/configs
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${CONFIG_PATH}/homarr/configs:/app/data/configs
-      - ${CONFIG_PATH}/homarr/icons:/app/public/icons
-      - ${CONFIG_PATH}/homarr/data:/data
+      - ${HOMARR_CONFIG}:/app/data/configs
+      - ${HOMARR_ICONS}:/app/public/icons
+      - ${HOMARR_DATA}:/data
     ports:
       - ${HOMARR_PORT}:7575
     network_mode: synobridge
@@ -162,7 +162,7 @@ services:
       - WEBUI_PORT=${QBITTORRENT_PORT_UI}
       - UMASK=002
     volumes:
-      - ${CONFIG_PATH}/qbittorrent:/config
+      - ${QBITTORRENT_CONFIG}:/config
       - ${DOWNLOADS_PATH}:/downloads
     ports:
       - ${QBITTORRENT_PORT}:${QBITTORRENT_PORT}/tcp
@@ -188,3 +188,28 @@ services:
     volumes:
       - ${MEDIA_PATH}:/scan_dir
     restart: unless-stopped
+
+  fileflows:
+    image: revenz/fileflows:stable
+    container_name: fileflows
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TempPathHost=${FILEFLOWS_TEMP}
+    volumes:
+      - ${MEDIA_PATH}:/media
+      - ${DOWNLOADS_PATH}:/downloads
+      - ${MOVIES_PATH}:/videos
+      - ${FILEFLOWS_TEMP}:/temp
+      - ${FILEFLOWS_DATA}:/app/Data
+      - ${FILEFLOWS_LOGS}:/app/Logs
+      - ${FILEFLOWS_COMMON}:/app/common
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - ${FILEFLOWS_PORT}:5000
+    devices:
+      - /dev/dri:/dev/dri
+    network_mode: synobridge
+    restart: unless-stopped
+

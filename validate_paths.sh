@@ -1,8 +1,20 @@
-#!/bin/bash
+set -a
+source .env
+set +a
 
-set -euo pipefail
+# --- Collect paths ---
+PATH_VARS=(
+  CONFIG_PATH MEDIA_PATH DOWNLOADS_PATH MOVIES_PATH TV_PATH ANIME_PATH
+  FILEFLOWS_TEMP FILEFLOWS_DATA FILEFLOWS_LOGS FILEFLOWS_COMMON
+  JELLYFIN_CONFIG JELLYFIN_LOG JELLYFIN_DATA JELLYFIN_CACHE
+  RADARR_CONFIG SONARR_CONFIG BAZARR_CONFIG PROWLARR_CONFIG
+  AUDIOBOOKSHELF_CONFIG AUDIOBOOKSHELF_METADATA
+  KAVITA_CONFIG JELLYSEERR_CONFIG
+  HOMARR_CONFIG HOMARR_ICONS HOMARR_DATA
+  QBITTORRENT_CONFIG
+)
 
-# function to check and create a directory
+# --- Function to resolve and create directories ---
 check_and_create_path() {
   local key="$1"
   local path="$2"
@@ -19,15 +31,10 @@ check_and_create_path() {
     return
   fi
 
-  # check if the directory already exists
   if [[ -d "$path" ]]; then
     echo "  path exists: $path"
-    # check write permissions on existing directory
-    if [[ ! -w "$path" ]]; then
-      echo "  error: insufficient permissions to write to $path"
-    fi
+    [[ ! -w "$path" ]] && echo "  error: insufficient permissions to write to $path"
   else
-    # check if parent directory is writable
     parent_dir=$(dirname "$path")
     if [[ ! -w "$parent_dir" ]]; then
       echo "  error: insufficient permissions to create $path in $parent_dir"
@@ -38,24 +45,12 @@ check_and_create_path() {
   fi
 }
 
-# main script
-if [[ ! -f .env ]]; then
-  echo "error: .env file not found."
-  exit 1
-fi
+# --- Loop through paths and validate/create ---
+for var in "${PATH_VARS[@]}"; do
+  eval resolved_path="\$$var"
+  check_and_create_path "$var" "$resolved_path"
+  echo
+done
 
-while IFS='=' read -r key value; do
-  # skip empty lines and comments
-  [[ -z "$key" || "$key" =~ ^# ]] && continue
+echo "✅ All path checks completed."
 
-  # trim whitespace (bash 4.x+ only)
-  key=$(echo "$key" | xargs)
-  value=$(echo "$value" | xargs)
-
-  # process only path-related variables
-  if [[ "$key" =~ _PATH$ ]]; then
-    check_and_create_path "$key" "$value"
-  fi
-done < .env
-
-echo "all path checks completed."

@@ -7,7 +7,7 @@ media types, including movies, TV shows, audiobooks, and more.
 ## Features
 
 - **Radarr**: Manage movie downloads.
-- **Sonarr**: Manage TV and anime.
+- **Sonarr**: Manage TV/Anime.
 - **Bazarr**: Subtitle management.
 - **Jellyfin**: Media server for streaming.
 - **Prowlarr**: Indexer for download clients.
