@@ -17,6 +17,8 @@ media types, including movies, TV shows, audiobooks, and more.
 - **Homarr**: Dashboard to monitor/manage services.
 - **qBittorrent**: Torrent client.
 - **Watchtower**: Automated Docker updates.
+- **FileFlows**: Automated media processing, including HEVC/AV1 transcoding.
+- **Subsyncarr**: Subtitle syncing and automation.
 
 ---
 
@@ -26,13 +28,13 @@ media types, including movies, TV shows, audiobooks, and more.
    Ensure Docker is installed and Docker Compose is available.
 
 2. **Setup `.env` File**:
-   Edit the `.env` file to set paths, ports, and user permissions.
+   Set a base folder using `BASE_PATH` and configure relative paths for media and Docker config. All volumes will automatically expand from this root.
 
-3. **Validate Paths**:
-   Use the provided script to validate or create required directories:
+3. **Validate & Create Required Paths**:
+   Run the setup script to automatically validate and create all required folders:
 
-   ```
-   ./validate_env_paths.sh
+   ```bash
+   ./setup.sh
    ```
 
 ---
@@ -42,7 +44,7 @@ media types, including movies, TV shows, audiobooks, and more.
 1. **Build and Start Containers**:
    Run the following command to start all services:
 
-   ```
+   ```bash
    docker-compose up -d
    ```
 
@@ -51,11 +53,12 @@ media types, including movies, TV shows, audiobooks, and more.
 
    - Radarr: `http://<your-ip>:7878`
    - Jellyfin: `http://<your-ip>:8096`
+   - FileFlows: `http://<your-ip>:19200`
 
 3. **Logs and Debugging**:
    Check logs if any service fails to start:
 
-   ```
+   ```bash
    docker-compose logs <service-name>
    ```
 
@@ -63,12 +66,24 @@ media types, including movies, TV shows, audiobooks, and more.
 
 ## Updating Services
 
-To update all services, use `Watchtower` or manually pull updates:
+To update all services, use Watchtower or manually pull updates:
 
-```
+```bash
 docker-compose pull
 docker-compose up -d
 ```
+
+---
+
+## Folder Structure
+
+All folder paths are defined in the `.env` file. This setup uses:
+
+- `CONFIG_PATH`: Base path for all Docker config files
+- `MEDIA_PATH`: Base path for media files (movies, TV, books, etc.)
+- `DOWNLOADS_PATH`: Download client destination
+
+Child directories (e.g., `fileflows/temp`, `jellyfin/config`) are derived automatically.
 
 ---
 
@@ -79,3 +94,4 @@ Feel free to submit issues or suggest improvements to this setup.
 ## License
 
 This project is licensed under the MIT License.
+
