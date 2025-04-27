@@ -45,7 +45,7 @@ media types, including movies, TV shows, audiobooks, and more.
    Run the following command to start all services:
 
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 2. **Verify Services**:
@@ -59,7 +59,7 @@ media types, including movies, TV shows, audiobooks, and more.
    Check logs if any service fails to start:
 
    ```bash
-   docker-compose logs <service-name>
+   docker compose logs <service-name>
    ```
 
 ---
@@ -69,8 +69,8 @@ media types, including movies, TV shows, audiobooks, and more.
 To update all services, use Watchtower or manually pull updates:
 
 ```bash
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 ```
 
 ---
