@@ -1,3 +1,4 @@
+# --- Source environment variables ---
 set -a
 source .env
 set +a
@@ -18,7 +19,6 @@ PATH_VARS=(
 check_and_create_path() {
   local key="$1"
   local path="$2"
-
   echo "checking $key: $path"
 
   if [[ -z "$path" ]]; then
@@ -35,13 +35,15 @@ check_and_create_path() {
     echo "  path exists: $path"
     [[ ! -w "$path" ]] && echo "  error: insufficient permissions to write to $path"
   else
-    parent_dir=$(dirname "$path")
-    if [[ ! -w "$parent_dir" ]]; then
-      echo "  error: insufficient permissions to create $path in $parent_dir"
-      return
-    fi
     echo "  creating path: $path"
-    mkdir -p "$path" && echo "  created successfully" || echo "  failed to create $path"
+    if mkdir -p "$path"; then
+      echo "  created successfully"
+    else
+      echo "  failed to create $path"
+      # Only check parent permissions if creation failed
+      parent_dir=$(dirname "$path")
+      [[ ! -w "$parent_dir" ]] && echo "  note: insufficient permissions in parent directory $parent_dir"
+    fi
   fi
 }
 
@@ -53,4 +55,3 @@ for var in "${PATH_VARS[@]}"; do
 done
 
 echo "✅ All path checks completed."
-
