@@ -19,6 +19,7 @@ PATH_VARS=(
 check_and_create_path() {
   local key="$1"
   local path="$2"
+
   echo "checking $key: $path"
 
   if [[ -z "$path" ]]; then
@@ -32,17 +33,14 @@ check_and_create_path() {
   fi
 
   if [[ -d "$path" ]]; then
-    echo "  path exists: $path"
-    [[ ! -w "$path" ]] && echo "  error: insufficient permissions to write to $path"
+    eceho " path exists: $path"
+	[[ ! -w "$path" ]] && echo "  error: insufficient permissions to write to $path"
   else
-    echo "  creating path: $path"
-    if mkdir -p "$path"; then
-      echo "  created successfully"
-    else
-      echo "  failed to create $path"
-      # Only check parent permissions if creation failed
-      parent_dir=$(dirname "$path")
-      [[ ! -w "$parent_dir" ]] && echo "  note: insufficient permissions in parent directory $parent_dir"
+    echo " creating path: $path"
+	if mkdir -p "$path"; then
+      echo " created successfully: $path"
+	else
+      echo " failed to create: $path"
     fi
   fi
 }
