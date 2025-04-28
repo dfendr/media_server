@@ -1,4 +1,44 @@
 services:
+  airvpn-vpn:
+    image: qmcgaw/gluetun
+    container_name: airvpn-vpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=airvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${AIRVPN_WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${AIRVPN_WIREGUARD_ADDRESS}
+      - WIREGUARD_PRESHARED_KEY=${AIRVPN_WIREGUARD_PRESHARED_KEY}
+      - SERVER_COUNTRIES=${AIRVPN_SERVER_COUNTRY}
+      - FIREWALL_VPN_INPUT_PORTS=${QBITTORRENT_PORT}
+      - TZ=${TZ}
+    ports:
+      - ${PROWLARR_PORT}:9696
+      - ${QBITTORRENT_PORT_UI}:8090
+      - ${QBITTORRENT_PORT}:${QBITTORRENT_PORT}
+      - ${SONNARR_PORT}:8989
+      - ${RADARR_PORT}:7878
+    restart: unless-stopped
+
+  ## Apps that need the VPN
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=${QBITTORRENT_PORT_UI}
+      - UMASK=002
+    volumes:
+      - ${QBITTORRENT_CONFIG}:/config
+      - ${DOWNLOADS_PATH}:/downloads
+    network_mode: service:airvpn-vpn
+    depends_on:
+      - airvpn-vpn
+    restart: unless-stopped
+
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
@@ -10,10 +50,43 @@ services:
       - ${MOVIES_PATH}:/media/movies
       - ${RADARR_CONFIG}:/config
       - ${DOWNLOADS_PATH}:/downloads
-    ports:
-      - ${RADARR_PORT}:7878
+    network_mode: service:airvpn-vpn
+    depends_on:
+      - airvpn-vpn
     restart: unless-stopped
 
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${TV_PATH}:/media/tv
+      - ${ANIME_PATH}:/media/anime
+      - ${SONARR_CONFIG}:/config
+      - ${DOWNLOADS_PATH}:/downloads
+    network_mode: service:airvpn-vpn
+    depends_on:
+      - airvpn-vpn
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${PROWLARR_CONFIG}:/config
+    network_mode: service:airvpn-vpn
+    depends_on:
+      - airvpn-vpn
+    restart: unless-stopped
+
+  # Local network services
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
@@ -33,22 +106,6 @@ services:
       - /dev/dri:/dev/dri
     restart: unless-stopped
 
-  sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
-    container_name: sonarr
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${TV_PATH}:/media/tv
-      - ${ANIME_PATH}:/media/anime
-      - ${SONARR_CONFIG}:/config
-      - ${DOWNLOADS_PATH}:/downloads
-    ports:
-      - ${SONARR_PORT}:8989
-    restart: unless-stopped
-
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
@@ -65,19 +122,6 @@ services:
       - ${DOWNLOADS_PATH}:/downloads
     ports:
       - ${BAZARR_PORT}:6767
-    restart: unless-stopped
-
-  prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${PROWLARR_CONFIG}:/config
-    ports:
-      - ${PROWLARR_PORT}:9696
     restart: unless-stopped
 
   audiobookshelf:
@@ -141,24 +185,6 @@ services:
       - ${HOMARR_DATA}:/data
     ports:
       - ${HOMARR_PORT}:7575
-    restart: unless-stopped
-
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - WEBUI_PORT=${QBITTORRENT_PORT_UI}
-      - UMASK=002
-    volumes:
-      - ${QBITTORRENT_CONFIG}:/config
-      - ${DOWNLOADS_PATH}:/downloads
-    ports:
-      - ${QBITTORRENT_PORT}:${QBITTORRENT_PORT}/tcp
-      - ${QBITTORRENT_PORT}:${QBITTORRENT_PORT}/udp
-      - ${QBITTORRENT_PORT_UI}:8090
     restart: unless-stopped
 
   watchtower:
