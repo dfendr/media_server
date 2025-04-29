@@ -33,7 +33,7 @@ check_and_create_path() {
   fi
 
   if [[ -d "$path" ]]; then
-    eceho " path exists: $path"
+    echo " path exists: $path"
 	[[ ! -w "$path" ]] && echo "  error: insufficient permissions to write to $path"
   else
     echo " creating path: $path"
