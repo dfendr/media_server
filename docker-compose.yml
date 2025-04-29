@@ -17,7 +17,7 @@ services:
       - ${PROWLARR_PORT}:9696
       - ${QBITTORRENT_PORT_UI}:8090
       - ${QBITTORRENT_PORT}:${QBITTORRENT_PORT}
-      - ${SONNARR_PORT}:8989
+      - ${SONARR_PORT}:8989
       - ${RADARR_PORT}:7878
     restart: unless-stopped
 
